@@ -363,21 +363,6 @@ class IngredientsCard extends StatelessWidget {
       ),
     );
   }
-
-  /*List<Widget> buildIngredients(List<Ingredient> ingredients) {
-    final tiles = List<ListTile>();
-
-    for (int i = 0; i < ingredients.length; i++) {
-      final step = steps[i];
-      tiles.add(ListTile(
-        leading: CircleAvatar(
-          child: Text("${i + 1}"),
-        ),
-        title: Text(step.content),
-      ));
-    }
-    return tiles;
-  }*/
 }
 
 class RecipeCard extends StatelessWidget {
