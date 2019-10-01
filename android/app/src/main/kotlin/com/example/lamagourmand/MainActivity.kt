@@ -1,4 +1,4 @@
-package com.example.lamagourmand
+package fr.free.lamagourmand
 
 import android.os.Bundle
 
