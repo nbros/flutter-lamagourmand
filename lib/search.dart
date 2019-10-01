@@ -41,12 +41,10 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // https://github.com/flutter/flutter/issues/41677
-                  // Hero(
-                  //   tag: recipe.asset,
-                  //   child: Image.asset("assets/" + recipe.asset, width: 150),
-                  // ),
-                  Image.asset("assets/" + recipe.asset, width: 150),
+                  Hero(
+                    tag: recipe.asset,
+                    child: Image.asset("assets/" + recipe.asset, width: 150),
+                  ),
                   SizedBox(width: 20),
                   Expanded(
                     child: Text(

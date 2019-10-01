@@ -128,8 +128,6 @@ class Details extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(recipe.name)),
       body: ListView(
-        // éviter la perte de l'image qui fait bugger le Hero
-        cacheExtent: double.maxFinite,
         children: [
           RecipeImage(recipe),
           if (recipe.ingredients.isNotEmpty) IngredientsCard(recipe),
