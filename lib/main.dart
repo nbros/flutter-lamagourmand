@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart' hide Step;
+import 'package:flutter/material.dart';
+import 'search.dart';
 import 'data.dart';
 
 void main() => runApp(MyApp());
@@ -31,6 +32,17 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Le Lama Gourmand"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () async {
+              final selectedRecipe = await showSearch(context: context, delegate: RecipeSearchDelegate());
+              if (selectedRecipe != null) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Details(selectedRecipe)));
+              }
+            },
+          )
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.orange[100],
@@ -121,7 +133,7 @@ class Details extends StatelessWidget {
         children: [
           RecipeImage(recipe),
           if (recipe.ingredients.isNotEmpty) IngredientsCard(recipe),
-          if (recipe.steps.isNotEmpty) RecipeCard(recipe),
+          if (recipe.instructions.isNotEmpty) RecipeCard(recipe),
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Center(
@@ -164,13 +176,13 @@ class IngredientsCard extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Column(
             children: [
+              SizedBox(height: 12),
               Align(
                 alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("Ingrédients", style: Theme.of(context).textTheme.title),
-                ),
+                child: Text("Ingrédients", style: Theme.of(context).textTheme.title.apply(fontSizeDelta: 5)),
               ),
+              if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.subtitle),
+              SizedBox(height: 20),
               ...buildIngredients(recipe.ingredients)
             ],
           ),
@@ -199,24 +211,27 @@ class IngredientLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
       children: [
         Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text(
-                ingredient.label,
-                textAlign: TextAlign.end,
-                style: Theme.of(context).textTheme.title,
-              ),
-            )),
-        Expanded(
-            flex: 1,
+            flex: 2,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
                 ingredient.quantity,
-                style: Theme.of(context).textTheme.subtitle,
+                style: Theme.of(context).textTheme.subhead,
+                textAlign: TextAlign.end,
+              ),
+            )),
+        Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                ingredient.label,
+                textAlign: TextAlign.start,
+                style: Theme.of(context).textTheme.subhead,
               ),
             )),
       ],
@@ -245,7 +260,7 @@ class RecipeCard extends StatelessWidget {
                   child: Text("Recette", style: Theme.of(context).textTheme.title),
                 ),
               ),
-              ...buildSteps(recipe.steps),
+              ...buildSteps(recipe.instructions),
             ],
           ),
         ),
@@ -253,17 +268,49 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  List<Widget> buildSteps(List<Step> steps) {
+  List<Widget> buildSteps(List<Instr> steps) {
     final tiles = List<ListTile>();
     for (int i = 0; i < steps.length; i++) {
       final step = steps[i];
       tiles.add(ListTile(
-        leading: CircleAvatar(
-          child: Text("${i + 1}"),
-        ),
+        leading: new StepCircle(i + 1),
         title: Text(step.content),
       ));
     }
     return tiles;
+  }
+}
+
+class StepCircle extends StatefulWidget {
+  const StepCircle(this.index);
+  final int index;
+
+  @override
+  _StepCircleState createState() => _StepCircleState();
+}
+
+class _StepCircleState extends State<StepCircle> {
+  bool _done = false;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 42.0;
+    return GestureDetector(
+      onTap: () => setState(() => _done = !_done),
+      child: AnimatedContainer(
+        constraints: BoxConstraints(minWidth: size, minHeight: size, maxWidth: size, maxHeight: size),
+        duration: Duration(milliseconds: 500),
+        decoration: BoxDecoration(
+          color: _done ? Colors.grey[300] : Colors.deepOrange,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Center(
+          child: Text(
+            _done ? "✓" : "${widget.index}",
+            style: TextStyle(color: Colors.white, fontSize: 20.0),
+          ),
+        ),
+      ),
+    );
   }
 }
