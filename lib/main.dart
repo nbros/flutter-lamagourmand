@@ -1,5 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'search.dart';
 import 'data.dart';
 import 'drawer.dart';
@@ -69,6 +73,33 @@ class _HomeState extends State<Home> {
       body: Page(pageIndex: _pageIndex),
       drawer: LamaDrawer(),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initDisplayMode();
+  }
+
+  void initDisplayMode() async {
+    try {
+      var allModes = await FlutterDisplayMode.supported;
+      allModes.forEach((mode) => log("display mode: $mode"));
+      var curMode = await FlutterDisplayMode.current;
+      log("current display mode: $curMode");
+      var newMode = await FlutterDisplayMode.current;
+      for (var mode in allModes) {
+        if(mode.width == curMode.width && mode.height == curMode.height && mode.refreshRate > newMode.refreshRate) {
+          newMode = mode;
+        }
+      }
+      if(newMode != curMode) {
+        log("setting display mode: $newMode");
+        FlutterDisplayMode.setMode(newMode);
+      }
+    } on PlatformException catch (e) {
+      log("error initializing display mode", level: 900, error: e);
+    }
   }
 }
 
