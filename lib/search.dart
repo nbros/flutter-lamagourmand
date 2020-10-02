@@ -49,7 +49,7 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
                   Expanded(
                     child: Text(
                       recipe.name,
-                      style: Theme.of(context).textTheme.title,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
                 ],

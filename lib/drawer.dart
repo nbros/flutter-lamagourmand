@@ -16,7 +16,8 @@ class LamaDrawer extends StatelessWidget {
               child: Image.asset("assets/llama.png", fit: BoxFit.scaleDown),
             ),
             applicationName: 'Lama Gourmand',
-            applicationVersion: 'Décembre 2019',
+            // TODO calcul de la version https://stackoverflow.com/questions/53672171/how-to-get-build-and-version-number-of-flutter-app
+            applicationVersion: 'Octobre 2020',
             aboutBoxChildren: [
               SizedBox(height: 24),
               Column(

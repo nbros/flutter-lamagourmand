@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -61,9 +60,9 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.orange[100],
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.cake), title: Text("Sucré")),
-          BottomNavigationBarItem(icon: Icon(Icons.restaurant), title: Text("Salé")),
-          BottomNavigationBarItem(icon: Icon(Icons.local_drink), title: Text("Boissons")),
+          BottomNavigationBarItem(icon: Icon(Icons.cake), label: "Sucré"),
+          BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "Salé"),
+          BottomNavigationBarItem(icon: Icon(Icons.local_drink), label: "Boissons"),
         ],
         currentIndex: _pageIndex,
         onTap: (index) => setState(() {
@@ -219,9 +218,9 @@ class IngredientsCard extends StatelessWidget {
               SizedBox(height: 12),
               Align(
                 alignment: Alignment.topCenter,
-                child: Text("Ingrédients", style: Theme.of(context).textTheme.title.apply(fontSizeDelta: 5)),
+                child: Text("Ingrédients", style: Theme.of(context).textTheme.headline6.apply(fontSizeDelta: 5)),
               ),
-              if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.subtitle),
+              if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.subtitle2),
               SizedBox(height: 20),
               ...buildIngredients(recipe.ingredients)
             ],
@@ -260,7 +259,7 @@ class IngredientLine extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
                 ingredient.quantity,
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
                 textAlign: TextAlign.end,
               ),
             )),
@@ -271,7 +270,7 @@ class IngredientLine extends StatelessWidget {
               child: Text(
                 ingredient.label,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subhead,
+                style: Theme.of(context).textTheme.subtitle1,
               ),
             )),
       ],
@@ -297,7 +296,7 @@ class RecipeCard extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("Recette", style: Theme.of(context).textTheme.title),
+                  child: Text("Recette", style: Theme.of(context).textTheme.headline6),
                 ),
               ),
               ...buildSteps(recipe.instructions),
