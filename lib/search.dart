@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'data.dart';
 
 class RecipeSearchDelegate extends SearchDelegate<Recipe> {
-  List<Recipe> recipes;
-
-  RecipeSearchDelegate() {
-    recipes = data.fold(List(), (e, list) => list + e);
-  }
+  final List<Recipe> recipes = data.fold([], (e, list) => list + e);
 
   @override
   List<Widget> buildActions(BuildContext context) {
@@ -22,7 +18,7 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
 
   @override
   Widget buildLeading(BuildContext context) {
-    return null;
+    return Container();
   }
 
   @override

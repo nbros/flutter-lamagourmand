@@ -1,8 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_displaymode/flutter_displaymode.dart';
+//import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'search.dart';
 import 'data.dart';
 import 'drawer.dart';
@@ -77,49 +78,54 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    initDisplayMode();
+    // initDisplayMode();
   }
 
-  void initDisplayMode() async {
-    try {
-      var allModes = await FlutterDisplayMode.supported;
-      allModes.forEach((mode) => log("display mode: $mode"));
-      var curMode = await FlutterDisplayMode.current;
-      log("current display mode: $curMode");
-      var newMode = await FlutterDisplayMode.current;
-      for (var mode in allModes) {
-        if(mode.width == curMode.width && mode.height == curMode.height && mode.refreshRate > newMode.refreshRate) {
-          newMode = mode;
-        }
-      }
-      if(newMode != curMode) {
-        log("setting display mode: $newMode");
-        FlutterDisplayMode.setMode(newMode);
-      }
-    } on PlatformException catch (e) {
-      log("error initializing display mode", level: 900, error: e);
-    }
-  }
+  // void initDisplayMode() async {
+  //   try {
+  //     var allModes = await FlutterDisplayMode.supported;
+  //     allModes.forEach((mode) => log("display mode: $mode"));
+  //     var curMode = await FlutterDisplayMode.current;
+  //     log("current display mode: $curMode");
+  //     var newMode = await FlutterDisplayMode.current;
+  //     for (var mode in allModes) {
+  //       if(mode.width == curMode.width && mode.height == curMode.height && mode.refreshRate > newMode.refreshRate) {
+  //         newMode = mode;
+  //       }
+  //     }
+  //     if(newMode != curMode) {
+  //       log("setting display mode: $newMode");
+  //       FlutterDisplayMode.setMode(newMode);
+  //     }
+  //   } on PlatformException catch (e) {
+  //     log("error initializing display mode", level: 900, error: e);
+  //   }
+  // }
 }
 
 class Page extends StatelessWidget {
   const Page({
-    Key key,
-    @required int pageIndex,
-  })  : _pageIndex = pageIndex,
+    Key? key,
+    required int pageIndex,
+  })   : _pageIndex = pageIndex,
         super(key: key);
 
   final int _pageIndex;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      key: PageStorageKey(_pageIndex),
-      itemBuilder: (context, index) {
-        final recipe = data[_pageIndex][index];
-        return RecipeOverviewCard(recipe);
-      },
-      itemCount: data[_pageIndex].length,
+    return Scrollbar(
+      isAlwaysShown: Platform.isWindows,
+      thickness: Platform.isWindows ? 12 : null,
+      radius: Radius.zero,
+      child: ListView.builder(
+        key: PageStorageKey(_pageIndex),
+        itemBuilder: (context, index) {
+          final recipe = data[_pageIndex][index];
+          return RecipeOverviewCard(recipe);
+        },
+        itemCount: data[_pageIndex].length,
+      ),
     );
   }
 }
@@ -218,7 +224,7 @@ class IngredientsCard extends StatelessWidget {
               SizedBox(height: 12),
               Align(
                 alignment: Alignment.topCenter,
-                child: Text("Ingrédients", style: Theme.of(context).textTheme.headline6.apply(fontSizeDelta: 5)),
+                child: Text("Ingrédients", style: Theme.of(context).textTheme.headline6?.apply(fontSizeDelta: 5)),
               ),
               if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.subtitle2),
               SizedBox(height: 20),
@@ -231,7 +237,7 @@ class IngredientsCard extends StatelessWidget {
   }
 
   List<Widget> buildIngredients(List<Ingredient> ingredients) {
-    final widgets = List<Widget>();
+    final widgets = <Widget>[];
     for (int i = 0; i < ingredients.length; i++) {
       final ingredient = ingredients[i];
       if (i > 0) {
@@ -308,7 +314,7 @@ class RecipeCard extends StatelessWidget {
   }
 
   List<Widget> buildSteps(List<Instr> steps) {
-    final tiles = List<ListTile>();
+    final tiles = <ListTile>[];
     for (int i = 0; i < steps.length; i++) {
       final step = steps[i];
       tiles.add(ListTile(

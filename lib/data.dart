@@ -1,10 +1,16 @@
 class Recipe {
   final String name;
   final String asset;
-  final String ingredientsQuantity;
+  final String? ingredientsQuantity;
   final List<Ingredient> ingredients;
   final List<Instr> instructions;
-  const Recipe({this.name, this.asset, this.ingredients = const [], this.ingredientsQuantity, this.instructions = const []});
+  const Recipe({
+    required this.name,
+    required this.asset,
+    this.ingredients = const [],
+    this.ingredientsQuantity,
+    this.instructions = const [],
+  });
 }
 
 class Ingredient {
