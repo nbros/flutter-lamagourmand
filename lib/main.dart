@@ -1,43 +1,47 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-//import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'search.dart';
 import 'data.dart';
 import 'drawer.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('fr'),
+      supportedLocales: const [
+        Locale('fr'),
       ],
       title: 'Le Lama Gourmand',
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
         scaffoldBackgroundColor: Colors.orange[100],
       ),
-      home: Home(),
+      navigatorKey: navigatorKey,
+      home: const _Home(),
     );
   }
 }
 
-class Home extends StatefulWidget {
+class _Home extends StatefulWidget {
+  const _Home();
+
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<_Home> {
   int _pageIndex = 0;
 
   @override
@@ -45,14 +49,14 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Le Lama Gourmand"),
+        title: const Text("Le Lama Gourmand"),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () async {
               final selectedRecipe = await showSearch(context: context, delegate: RecipeSearchDelegate());
               if (selectedRecipe != null) {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Details(selectedRecipe)));
+                navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => Details(selectedRecipe)));
               }
             },
           )
@@ -60,7 +64,7 @@ class _HomeState extends State<Home> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.orange[100],
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.cake), label: "Sucré"),
           BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: "Salé"),
           BottomNavigationBarItem(icon: Icon(Icons.local_drink), label: "Boissons"),
@@ -71,54 +75,32 @@ class _HomeState extends State<Home> {
         }),
       ),
       body: Page(pageIndex: _pageIndex),
-      drawer: LamaDrawer(),
+      drawer: const LamaDrawer(),
     );
   }
 
   @override
   void initState() {
     super.initState();
-    // initDisplayMode();
   }
-
-  // void initDisplayMode() async {
-  //   try {
-  //     var allModes = await FlutterDisplayMode.supported;
-  //     allModes.forEach((mode) => log("display mode: $mode"));
-  //     var curMode = await FlutterDisplayMode.current;
-  //     log("current display mode: $curMode");
-  //     var newMode = await FlutterDisplayMode.current;
-  //     for (var mode in allModes) {
-  //       if(mode.width == curMode.width && mode.height == curMode.height && mode.refreshRate > newMode.refreshRate) {
-  //         newMode = mode;
-  //       }
-  //     }
-  //     if(newMode != curMode) {
-  //       log("setting display mode: $newMode");
-  //       FlutterDisplayMode.setMode(newMode);
-  //     }
-  //   } on PlatformException catch (e) {
-  //     log("error initializing display mode", level: 900, error: e);
-  //   }
-  // }
 }
 
 class Page extends StatelessWidget {
   const Page({
-    Key? key,
+    super.key,
     required int pageIndex,
-  })   : _pageIndex = pageIndex,
-        super(key: key);
+  }) : _pageIndex = pageIndex;
 
   final int _pageIndex;
 
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
-      isAlwaysShown: Platform.isWindows,
+      thumbVisibility: Platform.isWindows,
       thickness: Platform.isWindows ? 12 : null,
       radius: Radius.zero,
       child: ListView.builder(
+        primary: true,
         key: PageStorageKey(_pageIndex),
         itemBuilder: (context, index) {
           final recipe = data[_pageIndex][index];
@@ -131,7 +113,7 @@ class Page extends StatelessWidget {
 }
 
 class RecipeOverviewCard extends StatelessWidget {
-  const RecipeOverviewCard(this.recipe);
+  const RecipeOverviewCard(this.recipe, {super.key});
   final Recipe recipe;
 
   @override
@@ -149,12 +131,12 @@ class RecipeOverviewCard extends StatelessWidget {
               elevation: 8,
               color: Colors.orange[200],
               child: Container(
-                margin: EdgeInsets.only(top: 20, bottom: 10),
+                margin: const EdgeInsets.only(top: 20, bottom: 10),
                 child: Column(
                   children: <Widget>[
                     RecipeImage(recipe),
-                    Padding(padding: EdgeInsets.only(bottom: 10)),
-                    Text(recipe.name, style: TextStyle(fontSize: 18)),
+                    const Padding(padding: EdgeInsets.only(bottom: 10)),
+                    Text(recipe.name, style: const TextStyle(fontSize: 18)),
                   ],
                 ),
               ),
@@ -168,7 +150,7 @@ class RecipeOverviewCard extends StatelessWidget {
 
 class Details extends StatelessWidget {
   final Recipe recipe;
-  const Details(this.recipe);
+  const Details(this.recipe, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -179,8 +161,8 @@ class Details extends StatelessWidget {
           RecipeImage(recipe),
           if (recipe.ingredients.isNotEmpty) IngredientsCard(recipe),
           if (recipe.instructions.isNotEmpty) RecipeCard(recipe),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
+          const Padding(
+            padding: EdgeInsets.all(20.0),
             child: Center(
               child: Text(
                 "Bon Appétit !",
@@ -195,39 +177,39 @@ class Details extends StatelessWidget {
 }
 
 class RecipeImage extends StatelessWidget {
-  const RecipeImage(this.recipe);
+  const RecipeImage(this.recipe, {super.key});
   final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
     return Hero(
       tag: recipe.asset,
-      child: Image.asset("assets/" + recipe.asset, fit: BoxFit.contain),
+      child: Image.asset("assets/${recipe.asset}", fit: BoxFit.contain),
     );
   }
 }
 
 class IngredientsCard extends StatelessWidget {
-  const IngredientsCard(this.recipe);
+  const IngredientsCard(this.recipe, {super.key});
   final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       child: Card(
         elevation: 10,
         child: Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Column(
             children: [
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Align(
                 alignment: Alignment.topCenter,
-                child: Text("Ingrédients", style: Theme.of(context).textTheme.headline6?.apply(fontSizeDelta: 5)),
+                child: Text("Ingrédients", style: Theme.of(context).textTheme.titleLarge?.apply(fontSizeDelta: 5)),
               ),
-              if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.subtitle2),
-              SizedBox(height: 20),
+              if (recipe.ingredientsQuantity != null) Text("(${recipe.ingredientsQuantity})", style: Theme.of(context).textTheme.titleSmall),
+              const SizedBox(height: 20),
               ...buildIngredients(recipe.ingredients)
             ],
           ),
@@ -241,7 +223,7 @@ class IngredientsCard extends StatelessWidget {
     for (int i = 0; i < ingredients.length; i++) {
       final ingredient = ingredients[i];
       if (i > 0) {
-        widgets.add(Divider());
+        widgets.add(const Divider());
       }
       widgets.add(IngredientLine(ingredient));
     }
@@ -250,7 +232,7 @@ class IngredientsCard extends StatelessWidget {
 }
 
 class IngredientLine extends StatelessWidget {
-  const IngredientLine(this.ingredient);
+  const IngredientLine(this.ingredient, {super.key});
   final Ingredient ingredient;
 
   @override
@@ -265,7 +247,7 @@ class IngredientLine extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Text(
                 ingredient.quantity,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.end,
               ),
             )),
@@ -276,7 +258,7 @@ class IngredientLine extends StatelessWidget {
               child: Text(
                 ingredient.label,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
             )),
       ],
@@ -285,13 +267,13 @@ class IngredientLine extends StatelessWidget {
 }
 
 class RecipeCard extends StatelessWidget {
-  const RecipeCard(this.recipe);
+  const RecipeCard(this.recipe, {super.key});
   final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       child: Card(
         elevation: 10,
         child: Padding(
@@ -302,7 +284,7 @@ class RecipeCard extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text("Recette", style: Theme.of(context).textTheme.headline6),
+                  child: Text("Recette", style: Theme.of(context).textTheme.titleLarge),
                 ),
               ),
               ...buildSteps(recipe.instructions),
@@ -318,7 +300,7 @@ class RecipeCard extends StatelessWidget {
     for (int i = 0; i < steps.length; i++) {
       final step = steps[i];
       tiles.add(ListTile(
-        leading: new StepCircle(i + 1),
+        leading: _StepCircle(i + 1),
         title: Text(step.content),
       ));
     }
@@ -326,15 +308,15 @@ class RecipeCard extends StatelessWidget {
   }
 }
 
-class StepCircle extends StatefulWidget {
-  const StepCircle(this.index);
+class _StepCircle extends StatefulWidget {
+  const _StepCircle(this.index);
   final int index;
 
   @override
   _StepCircleState createState() => _StepCircleState();
 }
 
-class _StepCircleState extends State<StepCircle> {
+class _StepCircleState extends State<_StepCircle> {
   bool _done = false;
 
   @override
@@ -343,8 +325,8 @@ class _StepCircleState extends State<StepCircle> {
     return GestureDetector(
       onTap: () => setState(() => _done = !_done),
       child: AnimatedContainer(
-        constraints: BoxConstraints(minWidth: size, minHeight: size, maxWidth: size, maxHeight: size),
-        duration: Duration(milliseconds: 500),
+        constraints: const BoxConstraints(minWidth: size, minHeight: size, maxWidth: size, maxHeight: size),
+        duration: const Duration(milliseconds: 500),
         decoration: BoxDecoration(
           color: _done ? Colors.grey[300] : Colors.deepOrange,
           borderRadius: BorderRadius.circular(100),
@@ -352,7 +334,7 @@ class _StepCircleState extends State<StepCircle> {
         child: Center(
           child: Text(
             _done ? "✓" : "${widget.index}",
-            style: TextStyle(color: Colors.white, fontSize: 20.0),
+            style: const TextStyle(color: Colors.white, fontSize: 20.0),
           ),
         ),
       ),

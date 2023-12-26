@@ -81,14 +81,11 @@ const data = [
         Instr("Faire fondre le beurre."),
         Instr("Dans un saladier mettre la farine, la levure et le sucre, mélanger puis faire un puit."),
         Instr("Ajouter ensuite l'oeuf et fouetter doucement pour éviter les grumeaux."),
-        Instr("Incorporer le beurre fondu en continuant à fouetter pour faciliter le mélange, " +
-            "puis délayer progressivement avec le lait et le rhum en continuant à fouetter jusqu'à obtention d'une pâte bien lisse.\n" +
-            "Attention la pâte est bien plus épaisse qu'une pâte à crêpe mais plus fluide qu'une pâte à gâteau."),
+        Instr("Incorporer le beurre fondu en continuant à fouetter pour faciliter le mélange, puis délayer progressivement avec le lait et le rhum en continuant à fouetter jusqu'à obtention d'une pâte bien lisse.\nAttention la pâte est bien plus épaisse qu'une pâte à crêpe mais plus fluide qu'une pâte à gâteau."),
         Instr("La pâte peut être utilisée dès maintenant mais supporte très bien le passage au réfrigérateur."),
         Instr("Faire cuire à la poêle à feux moyen en mettant une petite dose de pâte sans ajout de matière grasse nécessaire."),
         Instr("Retourner le pancake quand des bulles se forment à la surface. "),
-        Instr("À déguster chaud avec du sirop d'érable, ou du sucre glace, ou de la pâte à tartiner.\n" +
-            "La garniture n'a de limite que votre imagination et votre goût !"),
+        Instr("À déguster chaud avec du sirop d'érable, ou du sucre glace, ou de la pâte à tartiner.\n" "La garniture n'a de limite que votre imagination et votre goût !"),
       ],
     ),
     Recipe(

@@ -8,7 +8,7 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = "";
         },
@@ -39,13 +39,13 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
                 children: [
                   Hero(
                     tag: recipe.asset,
-                    child: Image.asset("assets/" + recipe.asset, width: 150),
+                    child: Image.asset("assets/${recipe.asset}", width: 150),
                   ),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   Expanded(
                     child: Text(
                       recipe.name,
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                 ],
@@ -53,7 +53,7 @@ class RecipeSearchDelegate extends SearchDelegate<Recipe> {
             ),
           ),
         ),
-        SizedBox(height: 8.0)
+        const SizedBox(height: 8.0)
       ],
     );
   }
