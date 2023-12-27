@@ -66,7 +66,7 @@ jobs:
 
       - name: Create key.properties
         run: |
-          echo "storeFile=android/app/upload-keystore.jks" > android/key.properties
+          echo "storeFile=upload-keystore.jks" > android/key.properties
           echo "storePassword=${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyPassword=${{ secrets.UPLOAD_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.UPLOAD_KEY_ALIAS }}" >> android/key.properties
