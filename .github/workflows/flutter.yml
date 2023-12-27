@@ -1,59 +1,128 @@
 name: Flutter CI/CD
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout from GitHub
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # for GitVersion
 
-    - name: Checkout from GitHub
-      uses: actions/checkout@v4
+      # cf https://github.com/GitTools/actions/blob/v0.10.2/docs/examples/github/gitversion/setup/usage-examples.md
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: "5.x"
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '11'
+      # cf https://github.com/GitTools/actions/blob/v0.10.2/docs/examples/github/gitversion/execute/usage-examples.md#example-5
+      - name: Use GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0
 
-    - name: Set up Flutter actions
-      uses: subosito/flutter-action@v2
-      with:
-        channel: 'stable'
+      - name: Display GitVersion outputs
+        run: |
+          echo "Major: ${{ steps.gitversion.outputs.major }}"
+          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+          echo "PreReleaseTag: ${{ steps.gitversion.outputs.preReleaseTag }}"
+          echo "PreReleaseTagWithDash: ${{ steps.gitversion.outputs.preReleaseTagWithDash }}"
+          echo "PreReleaseLabel: ${{ steps.gitversion.outputs.preReleaseLabel }}"
+          echo "PreReleaseNumber: ${{ steps.gitversion.outputs.preReleaseNumber }}"
+          echo "WeightedPreReleaseNumber: ${{ steps.gitversion.outputs.weightedPreReleaseNumber }}"
+          echo "BuildMetaData: ${{ steps.gitversion.outputs.buildMetaData }}"
+          echo "BuildMetaDataPadded: ${{ steps.gitversion.outputs.buildMetaDataPadded }}"
+          echo "FullBuildMetaData: ${{ steps.gitversion.outputs.fullBuildMetaData }}"
+          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          echo "LegacySemVer: ${{ steps.gitversion.outputs.legacySemVer }}"
+          echo "LegacySemVerPadded: ${{ steps.gitversion.outputs.legacySemVerPadded }}"
+          echo "AssemblySemVer: ${{ steps.gitversion.outputs.assemblySemVer }}"
+          echo "AssemblySemFileVer: ${{ steps.gitversion.outputs.assemblySemFileVer }}"
+          echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+          echo "InformationalVersion: ${{ steps.gitversion.outputs.informationalVersion }}"
+          echo "BranchName: ${{ steps.gitversion.outputs.branchName }}"
+          echo "EscapedBranchName: ${{ steps.gitversion.outputs.escapedBranchName }}"
+          echo "Sha: ${{ steps.gitversion.outputs.sha }}"
+          echo "ShortSha: ${{ steps.gitversion.outputs.shortSha }}"
+          echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"
+          echo "NuGetVersion: ${{ steps.gitversion.outputs.nuGetVersion }}"
+          echo "NuGetPreReleaseTagV2: ${{ steps.gitversion.outputs.nuGetPreReleaseTagV2 }}"
+          echo "NuGetPreReleaseTag: ${{ steps.gitversion.outputs.nuGetPreReleaseTag }}"
+          echo "VersionSourceSha: ${{ steps.gitversion.outputs.versionSourceSha }}"
+          echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.commitsSinceVersionSource }}"
+          echo "CommitsSinceVersionSourcePadded: ${{ steps.gitversion.outputs.commitsSinceVersionSourcePadded }}"
+          echo "UncommittedChanges: ${{ steps.gitversion.outputs.uncommittedChanges }}"
+          echo "CommitDate: ${{ steps.gitversion.outputs.commitDate }}"
 
-    - name: Check Flutter version
-      run: flutter --version
+      - name: Decode keystore
+        run: echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 --decode > ./upload-keystore.jks
 
-    - name: Install dependencies
-      run: flutter pub get
+      - name: Create key.properties
+        run: |
+          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "storePassword=${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.UPLOAD_KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.UPLOAD_KEY_ALIAS }}" >> android/key.properties
 
-    # - name: Run tests
-    #   run: flutter test
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "11"
+          cache: "gradle"
 
-    - name: Build APK
-      run: flutter build apk
+      - name: Check Java
+        run: java -version
 
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-release.apk
-        path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Check keystore contents
+        run: |
+          echo "${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}" | keytool -list -v -keystore ./upload-keystore.jks -storepass
 
-    - name: Build App Bundle
-      run: flutter build appbundle
+      - name: Set up Flutter actions
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
 
-    - name: Upload App Bundle
-      uses: actions/upload-artifact@v4
-      with:
-        name: aab
-        path: build/app/outputs/bundle/release/app-release.aab
+      - name: Check Flutter version
+        run: flutter --version
 
-    - name: Upload to Google Play
-      uses: r0adkll/upload-google-play@v1
-      with:
-        serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-        packageName: fr.free.lamagourmand
-        releaseFiles: build/app/outputs/bundle/release/app-release.aab
-        track: alpha
-        status: completed
+      - name: Install dependencies
+        run: flutter pub get
+
+      # - name: Run tests
+      #   run: flutter test
+
+      - name: Build APK
+        run: flutter build apk --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ steps.gitversion.outputs.BuildMetaData }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Build App Bundle
+        run: flutter build appbundle --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ steps.gitversion.outputs.BuildMetaData }}
+
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: fr.free.lamagourmand
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: alpha
+          status: draft # or completed to release directly
