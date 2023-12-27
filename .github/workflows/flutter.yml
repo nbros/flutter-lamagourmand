@@ -120,12 +120,13 @@ jobs:
           name: app-release.aab
           path: build/app/outputs/bundle/release/app-release.aab
 
+      # if a tag is being pushed, upload to Google Play
       - name: Upload to Google Play
+        if: startsWith(github.ref, 'refs/tags/')
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: fr.free.lamagourmand
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          # publish to production for tags, to alpha for other commits (internal, alpha, beta, production)
-          track: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'production' || 'alpha' }}
+          track: 'alpha' # internal, alpha, beta, production
           status: completed # draft, or completed(default) to release directly
