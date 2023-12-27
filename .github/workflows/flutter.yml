@@ -62,11 +62,11 @@ jobs:
           echo "CommitDate: ${{ steps.gitversion.outputs.commitDate }}"
 
       - name: Decode keystore
-        run: echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 --decode > ./upload-keystore.jks
+        run: echo "${{ secrets.UPLOAD_KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
 
       - name: Create key.properties
         run: |
-          echo "storeFile=upload-keystore.jks" > android/key.properties
+          echo "storeFile=android/app/upload-keystore.jks" > android/key.properties
           echo "storePassword=${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyPassword=${{ secrets.UPLOAD_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.UPLOAD_KEY_ALIAS }}" >> android/key.properties
@@ -100,7 +100,7 @@ jobs:
       #   run: flutter test
 
       - name: Build APK
-        run: flutter build apk --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ steps.gitversion.outputs.BuildMetaData }}
+        run: flutter build apk --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ github.run_number }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -109,7 +109,7 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Build App Bundle
-        run: flutter build appbundle --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ steps.gitversion.outputs.BuildMetaData }}
+        run: flutter build appbundle --build-name=${{ steps.gitversion.outputs.majorMinorPatch }}+${{ steps.gitversion.outputs.ShortSha }} --build-number=${{ github.run_number }}
 
       - name: Upload App Bundle
         uses: actions/upload-artifact@v4
