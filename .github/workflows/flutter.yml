@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -124,5 +126,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: fr.free.lamagourmand
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
-          track: alpha
-          status: draft # or completed to release directly
+          # publish to production for tags, to alpha for other commits (internal, alpha, beta, production)
+          track: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && 'production' || 'alpha' }}
+          status: completed # draft, or completed(default) to release directly
