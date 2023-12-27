@@ -82,8 +82,7 @@ jobs:
         run: java -version
 
       - name: Check keystore contents
-        run: |
-          echo "${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}" | keytool -list -v -keystore ./upload-keystore.jks -storepass
+        run: keytool -list -v -keystore ./upload-keystore.jks -storepass ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
 
       - name: Set up Flutter actions
         uses: subosito/flutter-action@v2
